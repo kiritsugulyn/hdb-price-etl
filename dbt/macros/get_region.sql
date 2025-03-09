@@ -1,0 +1,33 @@
+{% macro get_region(town) %}
+    CASE initcap({{ town }})
+        WHEN 'Sembawang' THEN 'North'
+        WHEN 'Woodlands' THEN 'North'
+        WHEN 'Yishun' THEN 'North'
+        WHEN 'Ang Mo Kio' THEN 'North-East'
+        WHEN 'Hougang' THEN 'North-East'
+        WHEN 'Punggol' THEN 'North-East'
+        WHEN 'Sengkang' THEN 'North-East'
+        WHEN 'Serangoon' THEN 'North-East'
+        WHEN 'Bedok' THEN 'East'
+        WHEN 'Pasir Ris' THEN 'East'
+        WHEN 'Tampines' THEN 'East'
+        WHEN 'Bukit Batok' THEN 'West'
+        WHEN 'Bukit Panjang' THEN 'West'
+        WHEN 'Choa Chu Kang' THEN 'West'
+        WHEN 'Clementi' THEN 'West'
+        WHEN 'Jurong East' THEN 'West'
+        WHEN 'Jurong West' THEN 'West'
+        WHEN 'Tengah' THEN 'West'
+        WHEN 'Bishan' THEN 'Central'
+        WHEN 'Bukit Merah' THEN 'Central'
+        WHEN 'Bukit Timah' THEN 'Central'
+        WHEN 'Central Area' THEN 'Central'
+        WHEN 'Geylang' THEN 'Central'
+        WHEN 'Kallang/Whampoa' THEN 'Central'
+        WHEN 'Marine Parade' THEN 'Central'
+        WHEN 'Queenstown' THEN 'Central'
+        WHEN 'Toa Payoh' THEN 'Central'
+        ELSE 'NA'
+    END
+
+{% endmacro %}
