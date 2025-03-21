@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: staging
+    database: "{{ env_var('DBT_DATABASE', 'versatile-being-445714-t8') }}"
+    schema: "{{ env_var('DBT_SCHEMA', 'hdb_price_etl_staging') }}"
+    tables:
+      - name: hdb_resale_price
+      - name: hdb_property_info
