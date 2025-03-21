@@ -15,6 +15,7 @@ hdb_property_info as (
 
 select 
     -- transaction time info
+    hdb_resale_price.year_month as year_month,
     hdb_resale_price.year as year,
     hdb_resale_price.month as month,
 
@@ -23,13 +24,15 @@ select
     initcap(hdb_resale_price.town) as town,
     initcap(hdb_resale_price.street_name) as street,
     upper(hdb_resale_price.block) as block,
+    concat('Blk ', upper(hdb_resale_price.block), ' ', initcap(hdb_resale_price.street_name)) as address,
 
     -- flat info
-    initcap(hdb_resale_price.flat_type) as flat_type,
-    initcap(hdb_resale_price.flat_model) as flat_model,
-    cast(left(hdb_resale_price.storey_range,2) as int64) as min_storey,
-    cast(right(hdb_resale_price.storey_range,2) as int64) as max_storey,
-    hdb_property_info.max_floor_lvl as bld_max_floor,
+    initcap(replace(hdb_resale_price.flat_type, '-', ' ')) as flat_type,
+    initcap(replace(hdb_resale_price.flat_model, '-', ' ')) as flat_model,
+    hdb_resale_price.min_storey as min_floor,
+    hdb_resale_price.max_storey as max_floor,
+    hdb_property_info.max_floor_lvl as bld_floor,
+    {{ get_floor_range('hdb_resale_price.min_storey', 'hdb_resale_price.max_storey', 'hdb_property_info.max_floor_lvl') }} as floor_range,
     hdb_resale_price.floor_area_sqm as floor_area_sqm,
     round(10.7639 * hdb_resale_price.floor_area_sqm, 1) as floor_area_sqf,
     
