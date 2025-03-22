@@ -37,9 +37,6 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 models:
   hdb_price_etl:
-    # Applies to all files under models/example/
-    example:
-      materialized: table
     staging:
       materialized: view
     core:
