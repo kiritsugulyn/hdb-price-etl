@@ -58,7 +58,7 @@ This dashboard serves as a **one-stop resource** for analyzing Singapore’s HDB
 - 🌍 **Terraform** – Infrastructure as Code (IaC) for cloud deployment  
 
 ## 📜 Architecture Diagram
- 
+![alt text](<Arch Diagram.jpg>)
 
 ## 🛠️ Setup Instructions
 
@@ -81,7 +81,7 @@ Ensure you have the following installed and configured before proceeding:
   - Installed in your working environment  
 
 ### Steps
-1️⃣ **Clone the repository**  
+1️⃣ **Clone the Repository**  
 ```sh
 git clone git@github.com:kiritsugulyn/hdb-price-etl.git
 ```
@@ -90,18 +90,18 @@ git clone git@github.com:kiritsugulyn/hdb-price-etl.git
 - Update the ``variables.tf`` with your own GCP credential file location, project ID, project location, Cloud storage bucket name, and Bigquery dataset name.
 - Run the following commands.
 ```sh
-cd hdb-price-etl\terraform
+cd hdb-price-etl/terraform
 terraform init
 terraform apply
 ```
 3️⃣ **Run Kestra using Docker Compose**  
 ```sh
-cd hdb-price-etl\flows
+cd hdb-price-etl/flows
 docker-compose up -d
 ```
 4️⃣ **Configure Namespace and KV Store in Kestra**  
 - Open Kestra in ``localhost:8080``.  
-- Create a **Flow** with the script ``flows\data_ingestion.yml``.
+- Create a **Flow** with the script ``flows/data_ingestion.yml``.
 - Update the namespace in the flow with your own namespace.  
 - Create the following key-value pairs in the **KV Store** under the same namespace (all values are string type):
   - ``GCP_PROJECT_ID``: Your GCP project ID
@@ -111,18 +111,18 @@ docker-compose up -d
   - ``GCP_CREDS``: Your GCP credential JSON
 
 5️⃣ **Execute Data Ingestion in Kestra**  
-- Create a python file in the **Files** under the same namespace with the script ``flows\data_ingestion_opensg.py``. Name it as ``data_ingestion_opensg.py``.
+- Create a python file in the **Files** under the same namespace with the script ``flows/data_ingestion_opensg.py``. Name it as ``data_ingestion_opensg.py``.
 - Execute the **Flow** ``data-ingestion`` in Kestra.  
   - After successful execution, 6 Parquet files are in your Cloud Storage bucket.
 
 6️⃣ **Execute Data Import from Cloud Storage to BigQuery**
-- Create a **Flow** with the script ``flows\bq_create_table.yml``
+- Create a **Flow** with the script ``flows/bq_create_table.yml``
   - Update namespace to be the same as the previous steps.
 - Execute the **Flow** ``bq_create_table`` in Kestra.  
   - After successful execution, two external tables and two partitioned tables are created under your BigQuery Dataset.
 
 7️⃣ **Execute Data Import from Cloud Storage to BigQuery**
-- Create a **Flow** with the script ``flows\dbt_build.yml``
+- Create a **Flow** with the script ``flows/dbt_build.yml``
   - Update namespace to be the same as the previous steps.
   - (Optional) Update the url in sync task if you prefer to use your own Github repository.
 - Execute the **Flow** ``dbt_build`` in Kestra.  
