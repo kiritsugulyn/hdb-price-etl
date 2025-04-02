@@ -2,7 +2,7 @@
 
 This repository outlines an ETL (Extract, Transform, Load) pipeline of Singapore HDB resale price data dashboard, leveraging various cloud and data engineering tools.  
   
-[**Link to Dashboard**](https://lookerstudio.google.com/s/pxFFQQYDf0U)
+[**Link to Dashboard**](https://lookerstudio.google.com/reporting/69d38486-089f-487e-9fb3-aec80884cb32)
 
 ## 📌 Overview
 The HDB resale market in Singapore has evolved significantly since 1990 due to policy changes, economic trends, and demand shifts. This dashboard provides an interactive way to analyze resale price trends, helping users make informed decisions.
