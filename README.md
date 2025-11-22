@@ -4,6 +4,21 @@ This repository outlines an ETL (Extract, Transform, Load) pipeline of Singapore
   
 [**Link to Dashboard**](https://lookerstudio.google.com/reporting/69d38486-089f-487e-9fb3-aec80884cb32)
 
+## 🔄 Updates
+
+<details>
+  <summary><strong>Click to expand</strong></summary>
+
+### 1. **Update Docker Compose for Latest Kestra Version**
+The `docker-compose.yml` file has been updated to support the **latest Kestra release**.
+
+### 2. **Update Flow Files**
+Flow definitions have been improved to include:
+- **Automatic GitHub Sync** for keeping tasks and configurations up-to-date with the repository.
+- **Inter-Flow Triggers** enabling seamless orchestration between dependent flows.
+
+</details>
+
 ## 📌 Overview
 The HDB resale market in Singapore has evolved significantly since 1990 due to policy changes, economic trends, and demand shifts. This dashboard provides an interactive way to analyze resale price trends, helping users make informed decisions.
 
@@ -102,33 +117,27 @@ docker-compose up -d
 4️⃣ **Configure Namespace and KV Store in Kestra**  
 - Open Kestra in ``localhost:8080``.  
 - Create a **Flow** with the script ``flows/data_ingestion.yml``.
-- Update the namespace in the flow with your own namespace.  
-- Create the following key-value pairs in the **KV Store** under the same namespace (all values are string type):
+- Create the following key-value pairs in the **KV Store** under the namespace ``hdb_etl`` (all values are string type):
   - ``GCP_PROJECT_ID``: Your GCP project ID
   - ``GCP_LOCATION``: Your GCP project location
   - ``GCP_BUCKET_NAME``: Your GCP Cloud Storage bucket name
   - ``GCP_DATASET``: You GCP BigQuery Dataset name
   - ``GCP_CREDS``: Your GCP credential JSON
 
-5️⃣ **Execute Data Ingestion in Kestra**  
-- Create a python file in the **Files** under the same namespace with the script ``flows/data_ingestion_opensg.py``. Name it as ``data_ingestion_opensg.py``.
-- Execute the **Flow** ``data-ingestion`` in Kestra.  
-  - After successful execution, 6 Parquet files are in your Cloud Storage bucket.
-
-6️⃣ **Execute Data Import from Cloud Storage to BigQuery**
+5️⃣ **Create Flows in Kestra**
 - Create a **Flow** with the script ``flows/bq_create_table.yml``
-  - Update namespace to be the same as the previous steps.
-- Execute the **Flow** ``bq_create_table`` in Kestra.  
-  - After successful execution, two external tables and two partitioned tables are created under your BigQuery Dataset.
-
-7️⃣ **Execute Data Import from Cloud Storage to BigQuery**
 - Create a **Flow** with the script ``flows/dbt_build.yml``
-  - Update namespace to be the same as the previous steps.
-  - (Optional) Update the url in sync task if you prefer to use your own Github repository.
-- Execute the **Flow** ``dbt_build`` in Kestra.  
-  - After successful execution, two staging views and one fact table are created under your BigQuery Dataset.
 
-8️⃣ **Create Dashboard in Looker Studio**
+6️⃣ **Execute Flows in Kestra**
+- Execute the **Flow** ``data-ingestion`` in Kestra.
+  - After successful execution, 6 Parquet files are in your Cloud Storage bucket.
+- **Flow** ``bq_create_table`` will be automatically executed after successful execution of **Flow** ``data-ingestion``.
+  - After successful execution, two external tables and two partitioned tables are created under your BigQuery Dataset.
+- **Flow** ``dbt_build`` will be automatically executed after successful execution of **Flow** ``bq_create_table``.
+  - After successful execution, two staging views and one fact table are created under your BigQuery Dataset.
+- (Optional) If you prefer to execute the flows one by one manually, remove/comment out the ``triggers`` section in the flow scripts.
+
+7️⃣ **Create Dashboard in Looker Studio**
 - In the Looker Studio, link data source to ``fact_hdb_resale`` in your BigQuery Dataset.
 - Create dashboard as you want.
 

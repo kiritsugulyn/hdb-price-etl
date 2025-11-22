@@ -1,5 +1,5 @@
 id: bq_create_table
-namespace: my.namespace
+namespace: hdb_etl
 
 tasks:
   - id: query
@@ -25,6 +25,16 @@ tasks:
       CREATE OR REPLACE TABLE {{kv('GCP_DATASET')}}.hdb_property_info AS (
         SELECT * FROM {{kv('GCP_DATASET')}}.hdb_property_info_external
       )
+
+triggers:
+  - id: upstream_dependancy
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: flow_trigger
+      flows:
+        - namespace: hdb_etl.python
+          flowId: data_ingestion
+          states: [SUCCESS]
 
 pluginDefaults:
   - type: io.kestra.plugin.gcp

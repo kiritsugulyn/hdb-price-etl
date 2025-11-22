@@ -1,5 +1,5 @@
 id: data_ingestion
-namespace: my.namespace
+namespace: hdb_etl.python
 
 variables:
   data_files:       
@@ -13,6 +13,15 @@ variables:
     ]
 
 tasks:
+  - id: sync
+    type: io.kestra.plugin.git.SyncNamespaceFiles
+    url: https://github.com/kiritsugulyn/hdb-price-etl
+    branch: main
+    namespace: "{{flow.namespace}}"
+    gitDirectory: python
+    dryRun: false
+    # disabled: true # this Git Sync is needed only when running it the first time, afterwards the task can be disabled
+
   - id: execute_python
     type: io.kestra.plugin.scripts.python.Commands
     namespaceFiles:

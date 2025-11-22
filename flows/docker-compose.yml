@@ -6,9 +6,9 @@ volumes:
 
 services:
   postgres:
-    image: postgres
+    image: postgres:latest
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql
     environment:
       POSTGRES_DB: kestra
       POSTGRES_USER: kestra
@@ -41,10 +41,10 @@ services:
             password: k3str4
         kestra:
           server:
-            basicAuth:
-              enabled: false
-              username: "admin@localhost.dev" # it must be a valid email address
-              password: kestra
+            basic-auth:
+              enabled: true
+              username: admin@kestra.io
+              password: Admin1234
           repository:
             type: postgres
           storage:

@@ -1,5 +1,5 @@
 id: dbt_build
-namespace: my.namespace
+namespace: hdb_etl.dbt
 
 tasks:
   - id: sync
@@ -44,6 +44,16 @@ tasks:
             timeout_seconds: 300
             fixed_retries: 1
         target: dev
+
+triggers:
+  - id: upstream_dependancy
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: flow_trigger
+      flows:
+        - namespace: hdb_etl
+          flowId: bq_create_table
+          states: [SUCCESS]
 
 pluginDefaults:
   - type: io.kestra.plugin.gcp

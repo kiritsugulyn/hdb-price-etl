@@ -4,7 +4,6 @@ This script:
 2. Writes the data into a Parquet file.
 """
 
-import os
 import requests
 import pandas as pd
 
