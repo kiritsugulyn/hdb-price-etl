@@ -9,13 +9,11 @@ This repository outlines an ETL (Extract, Transform, Load) pipeline of Singapore
 <details>
   <summary><strong>Click to expand</strong></summary>
 
-### 1. **Update Docker Compose for Latest Kestra Version**
-The `docker-compose.yml` file has been updated to support the **latest Kestra release**.
-
-### 2. **Update Flow Files**
-Flow definitions have been improved to include:
-- **Automatic GitHub Sync** for keeping tasks and configurations up-to-date with the repository.
-- **Inter-Flow Triggers** enabling seamless orchestration between dependent flows.
+#### **22/11/2025 Updates**
+- Update `docker-compose.yml` file to support the latest Kestra release.
+- Improve flow scripts to include:
+  - Automatic GitHub Sync for Python and dbt files.
+  - Inter-Flow triggers enabling orchestration between dependent flows.
 
 </details>
 
@@ -116,7 +114,7 @@ docker-compose up -d
 ```
 4️⃣ **Configure Namespace and KV Store in Kestra**  
 - Open Kestra in ``localhost:8080``.  
-- Create a **Flow** with the script ``flows/data_ingestion.yml``.
+- Create a flow with the script ``flows/data_ingestion.yml``.
 - Create the following key-value pairs in the **KV Store** under the namespace ``hdb_etl`` (all values are string type):
   - ``GCP_PROJECT_ID``: Your GCP project ID
   - ``GCP_LOCATION``: Your GCP project location
@@ -125,15 +123,15 @@ docker-compose up -d
   - ``GCP_CREDS``: Your GCP credential JSON
 
 5️⃣ **Create Flows in Kestra**
-- Create a **Flow** with the script ``flows/bq_create_table.yml``
-- Create a **Flow** with the script ``flows/dbt_build.yml``
+- Create a flow with the script ``flows/bq_create_table.yml``
+- Create a flow with the script ``flows/dbt_build.yml``
 
-6️⃣ **Execute Flows in Kestra**
-- Execute the **Flow** ``data-ingestion`` in Kestra.
+6️⃣ **Execute Flows in Kestra (with Triggers)**
+- Execute the flow ``data-ingestion`` in Kestra.
   - After successful execution, 6 Parquet files are in your Cloud Storage bucket.
-- **Flow** ``bq_create_table`` will be automatically executed after successful execution of **Flow** ``data-ingestion``.
+- Flow ``bq_create_table`` will be automatically executed after successful execution of flow ``data-ingestion``.
   - After successful execution, two external tables and two partitioned tables are created under your BigQuery Dataset.
-- **Flow** ``dbt_build`` will be automatically executed after successful execution of **Flow** ``bq_create_table``.
+- Flow ``dbt_build`` will be automatically executed after successful execution of flow ``bq_create_table``.
   - After successful execution, two staging views and one fact table are created under your BigQuery Dataset.
 - (Optional) If you prefer to execute the flows one by one manually, remove/comment out the ``triggers`` section in the flow scripts.
 
