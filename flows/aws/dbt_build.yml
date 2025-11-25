@@ -1,0 +1,60 @@
+id: dbt_build
+namespace: hdb_etl.dbt
+
+tasks:
+  - id: sync
+    type: io.kestra.plugin.git.SyncNamespaceFiles
+    url: https://github.com/kiritsugulyn/hdb-price-etl
+    branch: main
+    namespace: "{{flow.namespace}}"
+    gitDirectory: dbt_athena
+    dryRun: false
+    # disabled: true # this Git Sync is needed only when running it the first time, afterwards the task can be disabled
+
+  - id: dbt-build
+    type: io.kestra.plugin.dbt.cli.DbtCLI
+    env:
+      AWS_ACCESS_KEY_ID: "{{ kv('AWS_ACCESS_KEY_ID') }}"
+      AWS_SECRET_ACCESS_KEY: "{{ kv('AWS_SECRET_ACCESS_KEY') }}"
+      DBT_CATALOG: "{{kv('AWS_GLUE_CATALOG')}}"
+      DBT_SCHEMA: "{{kv('AWS_GLUE_DATABASE')}}"
+    namespaceFiles:
+      enabled: true
+    containerImage: ghcr.io/kestra-io/dbt-athena:latest
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    commands:
+      - dbt deps
+      - dbt build
+    storeManifest:
+      key: manifest.json
+      namespace: "{{ flow.namespace }}"
+    profiles: |
+      default:
+        outputs:
+          dev:
+            type: athena
+            database: "{{kv('AWS_GLUE_CATALOG')}}"
+            schema: "{{kv('AWS_GLUE_DATABASE')}}"
+            s3_staging_dir: "s3://{{kv('AWS_S3_STAGING_BUCKET')}}/"
+            region_name: "{{kv('AWS_REGION')}}"
+            threads: 4
+            work_group: "{{kv('AWS_ATHENA_WG')}}"
+        target: dev
+
+triggers:
+  - id: upstream_dependancy
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: flow_trigger
+      flows:
+        - namespace: hdb_etl.python
+          flowId: data_ingestion
+          states: [SUCCESS]
+
+pluginDefaults:
+  - type: io.kestra.plugin.aws
+    values:
+      accessKeyId: "{{kv('AWS_ACCESS_KEY_ID')}}"
+      secretKeyId: "{{kv('AWS_SECRET_ACCESS_KEY')}}"
+      region: "{{kv('AWS_REGION')}}"

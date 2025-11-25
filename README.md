@@ -2,12 +2,22 @@
 
 This repository outlines an ETL (Extract, Transform, Load) pipeline of Singapore HDB resale price data dashboard, leveraging various cloud and data engineering tools.  
   
-[**Link to Dashboard**](https://lookerstudio.google.com/reporting/69d38486-089f-487e-9fb3-aec80884cb32)
+[**Link to Dashboard (Looker Studio)**](https://lookerstudio.google.com/reporting/69d38486-089f-487e-9fb3-aec80884cb32)
 
 ## 🔄 Updates
 
 <details>
-  <summary><strong>Click to expand</strong></summary>
+  <summary><strong>Support for Other Cloud Providers</strong></summary>
+
+#### **25/11/2025 Updates**
+- **AWS S3 + Athena**: Add files for building the pipeline.
+  - Terraform files to deploy infrastructure: S3 buckets, Glue Crawler, and Athena workgroup.
+  - Kestra flows to perform ETL jobs using Athena (managed by dbt).
+
+</details>
+
+<details>
+  <summary><strong>Other Updates</strong></summary>
 
 #### **22/11/2025 Updates**
 - Update `docker-compose.yml` file to support the latest Kestra release.
@@ -109,7 +119,7 @@ terraform apply
 ```
 3️⃣ **Run Kestra using Docker Compose**  
 ```sh
-cd hdb-price-etl/flows
+cd ..
 docker-compose up -d
 ```
 4️⃣ **Configure Namespace and KV Store in Kestra**  

@@ -1,0 +1,18 @@
+/*
+Copy this file to `terraform.tfvars` (in this folder) and fill in your real values.
+DO NOT commit `terraform.tfvars` — it is listed in .gitignore.
+*/
+
+# AWS credentials
+aws_access_key_id     = "YOUR_ACCESS_KEY_ID_HERE"
+aws_secret_access_key = "YOUR_SECRET_ACCESS_KEY_HERE"
+
+# Optional overrides
+#region = "ap-southeast-1"
+#source_s3_bucket_name = "your-existing-source-bucket"
+#staging_bucket_name = "your-staging-bucket"
+#results_bucket_name = "your-athena-results-bucket"
+#glue_db_name = "hdb_price_etl"
+#athena_workgroup_name = "hdb-price-etl-wg"
+#glue_crawler_name = "hdb-price-etl-crawler"
+#glue_crawler_role_name = "hdb-price-etl-glue-crawler-role"

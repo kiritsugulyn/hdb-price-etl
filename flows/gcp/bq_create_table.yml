@@ -1,0 +1,45 @@
+id: bq_create_table
+namespace: hdb_etl
+
+tasks:
+  - id: query
+    type: io.kestra.plugin.gcp.bigquery.Query
+    sql: |
+      CREATE OR REPLACE EXTERNAL TABLE {{kv('GCP_DATASET')}}.hdb_resale_price_external
+      OPTIONS (
+        format = 'PARQUET',
+        uris = ['gs://{{kv('GCP_BUCKET_NAME')}}/resale_price_*.parquet']
+      );
+
+      CREATE OR REPLACE TABLE {{kv('GCP_DATASET')}}.hdb_resale_price
+      PARTITION BY
+        DATE_TRUNC(month, MONTH) AS
+      SELECT * REPLACE(PARSE_DATE('%Y-%m', month) AS month) FROM {{kv('GCP_DATASET')}}.hdb_resale_price_external;
+
+      CREATE OR REPLACE EXTERNAL TABLE {{kv('GCP_DATASET')}}.hdb_property_info_external
+      OPTIONS (
+        format = 'PARQUET',
+        uris = ['gs://{{kv('GCP_BUCKET_NAME')}}/hdb_property_info.parquet']
+      );
+
+      CREATE OR REPLACE TABLE {{kv('GCP_DATASET')}}.hdb_property_info AS (
+        SELECT * FROM {{kv('GCP_DATASET')}}.hdb_property_info_external
+      )
+
+triggers:
+  - id: upstream_dependancy
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: flow_trigger
+      flows:
+        - namespace: hdb_etl.python
+          flowId: data_ingestion
+          states: [SUCCESS]
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{kv('GCP_CREDS')}}"
+      projectId: "{{kv('GCP_PROJECT_ID')}}"
+      location: "{{kv('GCP_LOCATION')}}"
+      bucket: "{{kv('GCP_BUCKET_NAME')}}"

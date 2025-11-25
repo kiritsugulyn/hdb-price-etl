@@ -1,0 +1,70 @@
+id: data_ingestion
+namespace: hdb_etl.python
+
+variables:
+  data_files:       
+    [
+      "resale_price_1990_1999.parquet",
+      "resale_price_2000_2012.parquet",
+      "resale_price_2012_2014.parquet",
+      "resale_price_2015_2016.parquet",
+      "resale_price_2017_now.parquet",
+      "hdb_property_info.parquet"
+    ]
+
+tasks:
+  - id: sync
+    type: io.kestra.plugin.git.SyncNamespaceFiles
+    url: https://github.com/kiritsugulyn/hdb-price-etl
+    branch: main
+    namespace: "{{flow.namespace}}"
+    gitDirectory: python
+    dryRun: false
+    # disabled: true # this Git Sync is needed only when running it the first time, afterwards the task can be disabled
+
+  - id: execute_python
+    type: io.kestra.plugin.scripts.python.Commands
+    namespaceFiles:
+      enabled: true
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    containerImage: python:slim
+    warningOnStdErr: false
+    outputFiles: "{{render(vars.data_files)}}"
+    beforeCommands:
+      - pip install requests
+      - pip install pandas
+      - pip install pyarrow
+    commands:
+      - python data_ingestion_opensg.py
+
+  - id: upload_to_s3
+    type: io.kestra.plugin.core.flow.ForEach
+    values: "{{render(vars.data_files)}}"
+    tasks:
+      - id: file_name_check
+        type: io.kestra.plugin.core.flow.If
+        condition: "{{ taskrun.value == 'hdb_property_info.parquet' }}"
+        then:
+          - id: upload_one_file_1
+            type: io.kestra.plugin.aws.s3.Upload
+            bucket: "{{kv('AWS_S3_SOURCE_BUCKET')}}"
+            from: "{{outputs.execute_python.outputFiles[parent.taskrun.value]}}"
+            key: "property_info/{{parent.taskrun.value}}"
+        else:
+          - id: upload_one_file_2
+            type: io.kestra.plugin.aws.s3.Upload
+            bucket: "{{kv('AWS_S3_SOURCE_BUCKET')}}"
+            from: "{{outputs.execute_python.outputFiles[parent.taskrun.value]}}"
+            key: "resale_price/{{parent.taskrun.value}}"
+
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    disabled: false
+
+pluginDefaults:
+  - type: io.kestra.plugin.aws
+    values:
+      accessKeyId: "{{kv('AWS_ACCESS_KEY_ID')}}"
+      secretKeyId: "{{kv('AWS_SECRET_ACCESS_KEY')}}"
+      region: "{{kv('AWS_REGION')}}"
