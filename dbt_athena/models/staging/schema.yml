@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: staging
+    catalog: "{{ env_var('DBT_CATALOG', 'awsdatacatalog') }}"
+    schema: "{{ env_var('DBT_SCHEMA', 'hdb_price_etl') }}"
+    tables:
+      - name: resale_price
+      - name: property_info
